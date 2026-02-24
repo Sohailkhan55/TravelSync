@@ -1,0 +1,23 @@
+Starting debug search for Hyderabad...
+Result: [{'name': 'Error fetching restaurants', 'cuisine': 'N/A', 'must_try': 'N/A'}]
+Traceback (most recent call last):
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\agents\food_stay.py", line 45, in find_restaurants
+    food = chain.invoke({"results": search_results})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\venv\Lib\site-packages\langchain_core\runnables\base.py", line 3149, in invoke
+    input_ = context.run(step.invoke, input_, config, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\venv\Lib\site-packages\langchain_core\prompts\base.py", line 217, in invoke
+    return self._call_with_config(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\venv\Lib\site-packages\langchain_core\runnables\base.py", line 2058, in _call_with_config
+    context.run(
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\venv\Lib\site-packages\langchain_core\runnables\config.py", line 433, in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\venv\Lib\site-packages\langchain_core\prompts\base.py", line 190, in _format_prompt_with_error_handling
+    inner_input_ = self._validate_input(inner_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\OneDrive\Desktop\AntiGravity\travel_sync\venv\Lib\site-packages\langchain_core\prompts\base.py", line 184, in _validate_input
+    raise KeyError(
+KeyError: 'Input to ChatPromptTemplate is missing variables {\'"name"\'}.  Expected: [\'"name"\', \'results\'] Received: [\'results\']\nNote: if you intended {"name"} to be part of the string and not a variable, please escape it with double curly braces like: \'{{"name"}}\'.\nFor troubleshooting, visit: https://docs.langchain.com/oss/python/langchain/errors/INVALID_PROMPT_INPUT '

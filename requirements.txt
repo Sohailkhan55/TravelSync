@@ -1,0 +1,17 @@
+streamlit
+langchain
+langchain-community
+langchain-groq
+langgraph
+duckduckgo-search
+python-dotenv
+pandas
+sqlalchemy
+amadeus
+requests
+wikipedia
+google-auth-oauthlib
+google-auth
+phonenumbers
+bcrypt
+streamlit-autorefresh
