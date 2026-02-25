@@ -84,7 +84,7 @@ if page == "Plan a Trip":
                 st.warning("Please select at least one place.")
             else:
                 # Create group with the current user as creator
-                group_id = create_group(group_name, user_phone)
+                group_id = create_group(group_name, user_phone, result['destination'])
                 
                 # Save items
                 for place in selected:

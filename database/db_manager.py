@@ -148,13 +148,13 @@ def search_users(query):
     return users
 
 # --- Group Management ---
-def create_group(group_name, created_by_phone):
+def create_group(group_name, created_by_phone, destination=None):
     """Creates a new travel group and returns its ID."""
     group_id = str(uuid.uuid4())
     conn = get_connection()
     c = conn.cursor()
-    c.execute("INSERT INTO groups (group_id, group_name, created_by_phone) VALUES (?, ?, ?)", 
-              (group_id, group_name, created_by_phone))
+    c.execute("INSERT INTO groups (group_id, group_name, created_by_phone, destination) VALUES (?, ?, ?, ?)", 
+              (group_id, group_name, created_by_phone, destination))
     
     # Add creator as member
     c.execute("INSERT INTO group_members (group_id, user_phone) VALUES (?, ?)", (group_id, created_by_phone))
