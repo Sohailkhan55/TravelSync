@@ -1,10 +1,6 @@
-from langchain_groq import ChatGroq
-from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from .utils import get_llm
-
-search_tool = DuckDuckGoSearchRun()
 
 def plan_itinerary(destination: str):
     """
@@ -12,22 +8,17 @@ def plan_itinerary(destination: str):
     """
     llm = get_llm()
     
-    # Step 1: Search for top places
-    query = f"Top 20 best tourist places to visit in {destination} India"
-    search_results = search_tool.run(query)
-    
-    # Step 2: Parse into structured list
     parser = JsonOutputParser()
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a travel assistant. Content provided is search results about a city. Extract a comprehensive list of top tourist places (aim for 10-15 distinct places if available, minimum 2). Return ONLY a JSON list of objects, e.g. [{{\"name\": \"Place A\", \"description\": \"Short description\"}}]."),
-        ("human", "Search Results: {results}\n\nList the top 15 places:")
+        ("system", "You are an expert travel assistant with vast knowledge of places in India. Generate a comprehensive list of top tourist places in {destination} (aim for 10-15 distinct places if available, minimum 5). Return ONLY a JSON list of objects, e.g. [{{\"name\": \"Place A\", \"description\": \"Short description\"}}]. Do not include any other text."),
+        ("human", "List the top tourist places in {destination}:")
     ])
     
     chain = prompt | llm | parser
     
     try:
-        places = chain.invoke({"results": search_results})
+        places = chain.invoke({"destination": destination})
         return places
     except Exception as e:
         print(f"Planning Error: {e}")
