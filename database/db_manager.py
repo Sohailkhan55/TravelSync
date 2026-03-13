@@ -81,9 +81,27 @@ def init_db():
         sender_name TEXT, -- Cache name to avoid joining tables on every read
         message_content TEXT,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reply_to_id INTEGER,
         FOREIGN KEY(group_id) REFERENCES groups(group_id)
     )''')
     
+    # --- Migrations ---
+    # Add destination column to groups table if it doesn't exist
+    try:
+        c.execute("ALTER TABLE groups ADD COLUMN destination TEXT")
+    except sqlite3.OperationalError:
+        pass # Column already exists
+        
+    try:
+        c.execute("ALTER TABLE groups ADD COLUMN insider_data TEXT")
+    except sqlite3.OperationalError:
+        pass # Column already exists
+
+    try:
+        c.execute("ALTER TABLE chat_messages ADD COLUMN reply_to_id INTEGER")
+    except sqlite3.OperationalError:
+        pass
+
     conn.commit()
     conn.close()
 
