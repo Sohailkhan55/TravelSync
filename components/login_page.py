@@ -218,13 +218,14 @@ def render_login_page():
                             "pass_hash": hash_password(new_pass),
                             "otp": res["otp"]
                         }
-                        st.toast("OTP Sent to Console!", icon="📩")
+                        st.toast("OTP Generated Successfully!", icon="📩")
                     else:
                         st.error(res["error"])
         
         # OTP verification Step
         if "signup_data" in st.session_state:
-            st.info("Check your terminal for the Simulated OTP.")
+            otp_code = st.session_state["signup_data"]["otp"]
+            st.success(f"**DEV MODE:** Your simulated OTP is: `{otp_code}`")
             otp_input = st.text_input("Enter OTP", key="signup_otp")
             if st.button("Verify & Create Account"):
                 data = st.session_state["signup_data"]
