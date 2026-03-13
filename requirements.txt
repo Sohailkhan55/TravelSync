@@ -3,7 +3,7 @@ langchain
 langchain-community
 langchain-groq
 langgraph
-duckduckgo-search==3.9.9
+duckduckgo-search
 python-dotenv
 pandas
 sqlalchemy
