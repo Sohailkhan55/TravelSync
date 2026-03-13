@@ -32,20 +32,22 @@ def render_login_page():
                     try:
                         from google_auth_oauthlib.flow import Flow
                         
+                        redirect_uri_env = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8501").strip()
+                        
                         client_config = {
                             "web": {
                                 "client_id": os.getenv("GOOGLE_CLIENT_ID").strip(),
                                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET").strip(),
                                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                                 "token_uri": "https://oauth2.googleapis.com/token",
-                                "redirect_uris": ["http://localhost:8501"]
+                                "redirect_uris": [redirect_uri_env]
                             }
                         }
                         
                         flow = Flow.from_client_config(
                             client_config,
                             scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-                            redirect_uri="http://localhost:8501"
+                            redirect_uri=redirect_uri_env
                         )
                         
                         flow.fetch_token(code=auth_code)
@@ -72,7 +74,7 @@ def render_login_page():
                         
                     except Exception as e:
                         st.error(f"Authentication Failed: {e}")
-                        st.caption("Ensure your Redirect URI in Google Console is 'http://localhost:8501'")
+                        st.caption("Ensure your Redirect URI in Google Console matches your Streamlit URL.")
 
             # Logic to Display Login Button or Handle Success
             
@@ -122,25 +124,26 @@ def render_login_page():
                 if os.getenv("GOOGLE_CLIENT_ID"):
                     try:
                         from google_auth_oauthlib.flow import Flow
+                        redirect_uri_env = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8501").strip()
                         client_config = {
                             "web": {
                                 "client_id": os.getenv("GOOGLE_CLIENT_ID").strip(),
                                 "client_secret": os.getenv("GOOGLE_CLIENT_SECRET").strip(),
                                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                                 "token_uri": "https://oauth2.googleapis.com/token",
-                                "redirect_uris": ["http://localhost:8501"]
+                                "redirect_uris": [redirect_uri_env]
                             }
                         }
                         flow = Flow.from_client_config(
                             client_config,
                             scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-                            redirect_uri="http://localhost:8501"
+                            redirect_uri=redirect_uri_env
                         )
                         auth_url, _ = flow.authorization_url(prompt='consent')
                         
-                        # Use HTML to force opening in the same tab (target="_self")
+                        # Use target="_top" to escape Streamlit Cloud iframe
                         st.markdown(f'''
-                            <a href="{auth_url}" target="_self">
+                            <a href="{auth_url}" target="_top">
                                 <button style="
                                     width: 100%;
                                     background-color: #ffffff;
