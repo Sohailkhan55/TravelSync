@@ -141,28 +141,13 @@ def render_login_page():
                         )
                         auth_url, _ = flow.authorization_url(prompt='consent')
                         
-                        # Use target="_top" to escape Streamlit Cloud iframe
-                        st.markdown(f'''
-                            <a href="{auth_url}" target="_top">
-                                <button style="
-                                    width: 100%;
-                                    background-color: #ffffff;
-                                    color: #333333;
-                                    border: 1px solid #cccccc;
-                                    padding: 10px;
-                                    border-radius: 5px;
-                                    cursor: pointer;
-                                    font-weight: 500;
-                                    display: flex;
-                                    align-items: center;
-                                    justify_content: center;
-                                    gap: 10px;
-                                ">
-                                   <img src="https://www.google.com/favicon.ico" width="20" style="vertical-align: middle;">
-                                   Sign in with Google
-                                </button>
-                            </a>
-                        ''', unsafe_allow_html=True)
+                        # Use Streamlit's native link button which handles target logic better
+                        st.link_button(
+                            "🌐 Sign in with Google", 
+                            url=auth_url,
+                            use_container_width=True,
+                            type="secondary"
+                        )
                         
                     except Exception as e:
                         st.error(f"Config Error: {e}")
