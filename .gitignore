@@ -30,3 +30,4 @@ Thumbs.db
 
 # Brain artifacts
 brain/
+requirements_local.txt
