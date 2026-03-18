@@ -30,41 +30,31 @@ def render_login_page():
             if auth_code:
                 with st.spinner("Authenticating with Google..."):
                     try:
-                        from google_auth_oauthlib.flow import Flow
+                        import requests
                         
                         redirect_uri_env = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8501").strip()
+                        client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+                        client_secret = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
                         
-                        client_config = {
-                            "web": {
-                                "client_id": os.getenv("GOOGLE_CLIENT_ID").strip(),
-                                "client_secret": os.getenv("GOOGLE_CLIENT_SECRET").strip(),
-                                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                                "token_uri": "https://oauth2.googleapis.com/token",
-                                "redirect_uris": [redirect_uri_env]
-                            }
+                        token_data = {
+                            "code": auth_code,
+                            "client_id": client_id,
+                            "client_secret": client_secret,
+                            "redirect_uri": redirect_uri_env,
+                            "grant_type": "authorization_code"
                         }
                         
-                        flow = Flow.from_client_config(
-                            client_config,
-                            scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-                            redirect_uri=redirect_uri_env
-                        )
-                        
-                        # Fix (invalid_grant) Missing code verifier on Cloud
-                        if "oauth_verifier" in st.session_state:
-                            # We must manually inject the state we saved before the redirect into the flow
-                            os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # usually needed behind proxies
-                            flow.code_verifier = st.session_state["oauth_verifier"]
+                        token_res = requests.post("https://oauth2.googleapis.com/token", data=token_data)
+                        if not token_res.ok:
+                            raise Exception(f"Token Error: {token_res.text}")
                             
-                        flow.fetch_token(code=auth_code)
-                        credentials = flow.credentials
+                        access_token = token_res.json().get("access_token")
                         
                         # Get User Info
-                        import requests
                         user_info_service = requests.get(
                             "https://www.googleapis.com/oauth2/v1/userinfo",
                             params={"alt": "json"},
-                            headers={"Authorization": f"Bearer {credentials.token}"}
+                            headers={"Authorization": f"Bearer {access_token}"}
                         )
                         google_user_data = user_info_service.json()
                         
@@ -80,7 +70,7 @@ def render_login_page():
                         
                     except Exception as e:
                         st.error(f"Authentication Failed: {e}")
-                        st.caption("Ensure your Redirect URI in Google Console matches your Streamlit URL.")
+                        st.caption("Ensure GOOGLE_REDIRECT_URI exactly matches in Google Console and Streamlit Secrets.")
 
             # Logic to Display Login Button or Handle Success
             
@@ -129,26 +119,19 @@ def render_login_page():
                 # Show Login Button (Generate URL)
                 if os.getenv("GOOGLE_CLIENT_ID"):
                     try:
-                        from google_auth_oauthlib.flow import Flow
+                        import urllib.parse
                         redirect_uri_env = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8501").strip()
-                        client_config = {
-                            "web": {
-                                "client_id": os.getenv("GOOGLE_CLIENT_ID").strip(),
-                                "client_secret": os.getenv("GOOGLE_CLIENT_SECRET").strip(),
-                                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                                "token_uri": "https://oauth2.googleapis.com/token",
-                                "redirect_uris": [redirect_uri_env]
-                            }
-                        }
-                        flow = Flow.from_client_config(
-                            client_config,
-                            scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-                            redirect_uri=redirect_uri_env
-                        )
+                        client_id = os.getenv("GOOGLE_CLIENT_ID", "").strip()
                         
-                        # Generate the auth URL and store the PKCE verifier inside session_state
-                        auth_url, _ = flow.authorization_url(prompt='consent', include_granted_scopes='true')
-                        st.session_state["oauth_verifier"] = flow.code_verifier
+                        params = {
+                            "client_id": client_id,
+                            "redirect_uri": redirect_uri_env,
+                            "response_type": "code",
+                            "scope": "openid email profile",
+                            "prompt": "consent",
+                            "access_type": "offline"
+                        }
+                        auth_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode(params)
                         
                         # Use Streamlit's native link button which handles target logic better
                         st.link_button(
