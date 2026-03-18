@@ -50,6 +50,13 @@ def render_login_page():
                             redirect_uri=redirect_uri_env
                         )
                         
+                        # Fix (invalid_grant) Missing code verifier on Cloud
+                        if "oauth_verifier" in st.session_state:
+                            # We must manually inject the state we saved before the redirect into the flow
+                            import os
+                            os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # usually needed behind proxies
+                            flow.code_verifier = st.session_state["oauth_verifier"]
+                            
                         flow.fetch_token(code=auth_code)
                         credentials = flow.credentials
                         
@@ -139,7 +146,10 @@ def render_login_page():
                             scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
                             redirect_uri=redirect_uri_env
                         )
-                        auth_url, _ = flow.authorization_url(prompt='consent')
+                        
+                        # Generate the auth URL and store the PKCE verifier inside session_state
+                        auth_url, _ = flow.authorization_url(prompt='consent', include_granted_scopes='true')
+                        st.session_state["oauth_verifier"] = flow.code_verifier
                         
                         # Use Streamlit's native link button which handles target logic better
                         st.link_button(
