@@ -135,7 +135,7 @@ def render_login_page():
                         
                         # Use Streamlit's native link button which handles target logic better
                         st.link_button(
-                            "🌐 Sign in with Google", 
+                            "![Google Logo](https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg) Sign in with Google", 
                             url=auth_url,
                             use_container_width=True,
                             type="secondary"
