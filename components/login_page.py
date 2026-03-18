@@ -53,7 +53,6 @@ def render_login_page():
                         # Fix (invalid_grant) Missing code verifier on Cloud
                         if "oauth_verifier" in st.session_state:
                             # We must manually inject the state we saved before the redirect into the flow
-                            import os
                             os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # usually needed behind proxies
                             flow.code_verifier = st.session_state["oauth_verifier"]
                             
